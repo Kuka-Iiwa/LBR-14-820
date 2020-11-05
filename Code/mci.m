@@ -24,7 +24,7 @@ POSE2 = [
 POSE3 = [                       %theta1 = -90;
     0   -1  0   0;              %theta2 =  30;
     1    0  0   -1.732051;      %theta3 =   0;
-    0    0  1   2;              %theta4 = -60;
+    0    0  1   2;              %theta4 =  60;
     0    0  1   1;              %theta5 =   0;
 ];                              %theta6 = 120;
                                 %theta7 =   0;
@@ -36,7 +36,7 @@ POSE = POSE3;
 Xc = POSE(1,4) - a7*POSE(1,3);
 Yc = POSE(2,4) - a7*POSE(2,3);
 Zc = POSE(3,4) - a7*POSE(3,3);
-%Exibir ponto C
+%Exibir ponto C 
 [Xc;Yc;Zc]
 
 % INDICE - MCI de posição
@@ -51,7 +51,7 @@ Zc = POSE(3,4) - a7*POSE(3,3);
 
 %Lei dos Cossenos
 r2        = Xc^2 + Yc^2 + (Zc-a1)^2;       % R^2
-
+rl        = sqrt(Xc^2 + Yc^2)
 D         = (a3^2 + a2^2 - r2  ) / (2*a2*a3);
 E         = (r2   + a2^2 - a3^2) / (2*sqrt(r2)*a3);
 
@@ -66,8 +66,8 @@ theta1(7) = theta1(3) + pi;
 theta1(8) = theta1(4) + pi;
 
 % Theta 4
-theta4(1) = pi - atan2(-sqrt(1-D^2),D);
-theta4(2) = pi - atan2( sqrt(1-D^2),D);
+theta4(1) = pi - atan2( sqrt(1-D^2),D);
+theta4(2) = pi - atan2(-sqrt(1-D^2),D);
 theta4(3) = theta4(1);
 theta4(4) = theta4(2);
 theta4(5) = -theta4(1);
@@ -86,10 +86,10 @@ theta3(7) = theta3(3);
 theta3(8) = theta3(4);
 
 % Theta 2
-theta2(1) = atan2(Zc-a1,sqrt(r2)) - atan2( sqrt(1-E^2),E);
-theta2(2) = atan2(Zc-a1,sqrt(r2)) - atan2(-sqrt(1-E^2),E);
-theta2(3) = atan2(Zc-a1,sqrt(r2));
-theta2(4) = atan2(Zc-a1,sqrt(r2));
+theta2(1) = atan2(Zc-a1,rl) - atan2(-sqrt(1-E^2),E);
+theta2(2) = atan2(Zc-a1,rl) - atan2( sqrt(1-E^2),E);
+theta2(3) = atan2(Zc-a1,rl);
+theta2(4) = atan2(Zc-a1,rl);
 theta2(5) = pi-theta2(1);
 theta2(6) = pi-theta2(2);
 theta2(7) = pi-theta2(1);
