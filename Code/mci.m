@@ -78,8 +78,8 @@ theta4(8) = -theta4(4);
 % Theta 3
 theta3(1) =  0;
 theta3(2) =  0;
-theta3(3) = pi;
-theta3(4) = pi;
+theta3(3) = pi/2;
+theta3(4) = pi/2;
 theta3(5) = theta3(1);
 theta3(6) = theta3(2);
 theta3(7) = theta3(3);
