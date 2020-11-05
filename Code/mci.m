@@ -101,38 +101,17 @@ theta2(8) = pi-theta2(2);
 % A - Punho Normal
 % B - Punho Invertido
 
-% Calculo de R36 para theta3=0°
-R = POSE([1 2 3], [1 2 3]);
-for i = [1 2 5 6]
-    R03(:,:) = [ %Verificar atribuição de frames se é igual exemplo
-        cos(theta1(i))*cos(theta2(i)-theta4(i)) -cos(theta1(i))*sin(theta2(i)-theta4(i))  sin(theta1(i));
-        sin(theta1(i))*cos(theta2(i)-theta4(i)) -sin(theta1(i))*sin(theta2(i)-theta4(i)) -cos(theta1(i));
-                       sin(theta2(i)-theta4(i))                 cos(theta2(i)-theta4(i))               0;
-    ];
-    R36(:,:,i) = (R03.') * R;
-end
-
-% Calculo de R36 para theta3=90°
-for i = [3 4 7 8]
-    R03(:,:) = [ %Calcular nova matriz!!!!!
-        cos(theta1(i))*cos(theta2(i)-theta4(i)) -cos(theta1(i))*sin(theta2(i)-theta4(i))  sin(theta1(i));
-        sin(theta1(i))*cos(theta2(i)-theta4(i)) -sin(theta1(i))*sin(theta2(i)-theta4(i)) -cos(theta1(i));
-                       sin(theta2(i)-theta4(i))                 cos(theta2(i)-theta4(i))               0;
-    ];
-    R36(:,:,i) = (R03.') * R;
-end
-
 % Calculo dos Theta
 for i = 1:8
-    theta5(i) = atan2( -cos(theta1(i))*sin(theta2(i)-theta4(i))*R36(1,3,i) - sin(theta1(i))*sin(theta2(i)-theta4(i))*R36(2,3,i) + cos(theta2(i)-theta4(i))*R36(3,3,i) ,                         cos(theta1(i))*cos(theta2(i)-theta4(i))*R36(1,3,i) + sin(theta1(i))*cos(theta2(i)-theta4(i))*R36(2,3,i) + sin(theta2(i)-theta4(i))*R36(3,3,i) );
+    theta5(i) = atan2( -cos(theta1(i))*sin(theta2(i)-theta4(i))*POSE(1,3) - sin(theta1(i))*sin(theta2(i)-theta4(i))*POSE(2,3) + cos(theta2(i)-theta4(i))*POSE(3,3) ,                         cos(theta1(i))*cos(theta2(i)-theta4(i))*POSE(1,3) + sin(theta1(i))*cos(theta2(i)-theta4(i))*POSE(2,3) + sin(theta2(i)-theta4(i))*POSE(3,3) );
 
     theta5b(i) = theta5(i)+pi;
 
-    theta6(i) = atan2( sqrt(1-(sin(theta1(i))*R36(1,3,i) - cos(theta1(i))*R36(2,3,i))^2),                         sin(theta1(i))*R36(1,3,i) - cos(theta1(i))*R36(2,3,i) );
+    theta6(i) = atan2( sqrt(1-(sin(theta1(i))*POSE(1,3) - cos(theta1(i))*POSE(2,3))^2),                         sin(theta1(i))*POSE(1,3) - cos(theta1(i))*POSE(2,3) );
 
-    theta6b(i)= atan2(-sqrt(1-(sin(theta1(i))*R36(1,3,i) - cos(theta1(i))*R36(2,3,i))^2),                         sin(theta1(i))*R36(1,3,i) - cos(theta1(i))*R36(2,3,i) );
+    theta6b(i)= atan2(-sqrt(1-(sin(theta1(i))*POSE(1,3) - cos(theta1(i))*POSE(2,3))^2),                         sin(theta1(i))*POSE(1,3) - cos(theta1(i))*POSE(2,3) );
 
-    theta7(i) = atan2(             sin(theta1(i))*R36(1,2,i) - cos(theta1(i))*R36(2,2,i),                        -sin(theta1(i))*R36(1,1,i) + cos(theta1(i))*R36(2,1,i));
+    theta7(i) = atan2(             sin(theta1(i))*POSE(1,2) - cos(theta1(i))*POSE(2,2),                        -sin(theta1(i))*POSE(1,1) + cos(theta1(i))*POSE(2,1));
 
     theta7b(i) = theta7(i)+pi;
 end
@@ -156,8 +135,8 @@ end
 % 16 - Braço trás    Cotovelo Direita   Punho Invertido
 
 for i = 1:8
-    sol (i  ,:) = [theta1(i) theta2(i) theta3(i) theta4(i)  theta5(i)  theta6(i)  theta6(i)]*180/pi;
-    sol (i+8,:) = [theta1(i) theta2(i) theta3(i) theta4(i) theta5b(i) theta6b(i) theta6b(i)]*180/pi;
+    sol (i  ,:) = [theta1(i) theta2(i) theta3(i) theta4(i)  theta5(i)  theta6(i)  theta7(i)]*180/pi;
+    sol (i+8,:) = [theta1(i) theta2(i) theta3(i) theta4(i) theta5b(i) theta6b(i) theta7b(i)]*180/pi;
 end
 
 %Solução completa
