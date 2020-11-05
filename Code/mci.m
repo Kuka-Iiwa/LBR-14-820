@@ -36,7 +36,7 @@ POSE = POSE3;
 Xc = POSE(1,4) - a7*POSE(1,3);
 Yc = POSE(2,4) - a7*POSE(2,3);
 Zc = POSE(3,4) - a7*POSE(3,3);
-%usar ponto C de validação. Ignorar POSE 
+%Exibir ponto C
 [Xc;Yc;Zc]
 
 % INDICE - MCI de posição
