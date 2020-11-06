@@ -7,26 +7,26 @@ a7=1; % Comprimento do centro do pinho esferico ao efetuador
 
 % POSE desejada
 POSE1 = [ 
--1  0  0    2;
- 0 -1  0    0;
+ 1  0  0    2;
+ 0  1  0    0;
  0  0  1    2;
  0  0  0    1;
-]; % Posição home, entretanto com theta6 = 90°
+]; % Posição home, entretanto com theta2 = 90° e theta6 = -90°
 
 POSE2 = [ 
--1  0  0    2;
+ 1  0  0    2;
  0  0 -1   -1;
- 0 -1  0    1;
+ 0  1  0    1;
  0  0  0    1;
-]; % Posição home, entretanto com theta3 = 90° e theta6 = 90°
+]; % Posição home, entretanto com theta2 = theta3 = 90° e theta6 = -90°
 
 
 POSE3 = [                       %theta1 = -90;
-    0   -1  0   0;              %theta2 =  30;
-    1    0  0   -1.732051;      %theta3 =   0;
+    0    1  0   0;              %theta2 =  60;
+   -1    0  0   -1.732051;      %theta3 =   0;
     0    0  1   2;              %theta4 =  60;
     0    0  1   1;              %theta5 =   0;
-];                              %theta6 = 120;
+];                              %theta6 =-120;
                                 %theta7 =   0;
 
 POSE = POSE3;
@@ -58,22 +58,22 @@ E         = (r2   + a2^2 - a3^2) / (2*sqrt(r2)*a3);
 % Theta 1
 theta1(1) = atan2(Yc,Xc);
 theta1(2) = theta1(1);
-theta1(3) = theta1(1) + atan2( sqrt(1-E^2),E);
-theta1(4) = theta1(1) + atan2(-sqrt(1-E^2),E);
+theta1(3) = theta1(1) + atan2(-sqrt(1-E^2),E);
+theta1(4) = theta1(1) + atan2( sqrt(1-E^2),E);
 theta1(5) = theta1(1) + pi;
 theta1(6) = theta1(2) + pi;
-theta1(7) = theta1(3) + pi;
-theta1(8) = theta1(4) + pi;
+theta1(7) = theta1(4) + pi;
+theta1(8) = theta1(3) + pi;
 
 % Theta 4
 theta4(1) = pi - atan2( sqrt(1-D^2),D);
 theta4(2) = pi - atan2(-sqrt(1-D^2),D);
 theta4(3) = theta4(1);
 theta4(4) = theta4(2);
-theta4(5) = -theta4(1);
-theta4(6) = -theta4(2);
-theta4(7) = -theta4(3);
-theta4(8) = -theta4(4);
+theta4(5) = -theta4(2);
+theta4(6) = -theta4(1);
+theta4(7) = -theta4(2);
+theta4(8) = -theta4(1);
 
 % Theta 3
 theta3(1) =  0;
@@ -86,14 +86,14 @@ theta3(7) = theta3(3);
 theta3(8) = theta3(4);
 
 % Theta 2
-theta2(1) = atan2(Zc-a1,rl) - atan2(-sqrt(1-E^2),E);
-theta2(2) = atan2(Zc-a1,rl) - atan2( sqrt(1-E^2),E);
-theta2(3) = atan2(Zc-a1,rl);
-theta2(4) = atan2(Zc-a1,rl);
-theta2(5) = pi-theta2(1);
-theta2(6) = pi-theta2(2);
-theta2(7) = pi-theta2(1);
-theta2(8) = pi-theta2(2);
+theta2(1) = pi/2 - atan2(Zc-a1,rl) + atan2(-sqrt(1-E^2),E);
+theta2(2) = pi/2 - atan2(Zc-a1,rl) + atan2( sqrt(1-E^2),E);
+theta2(3) = pi/2 - atan2(Zc-a1,rl);
+theta2(4) = pi/2 - atan2(Zc-a1,rl);
+theta2(5) = pi+theta2(1);
+theta2(6) = pi+theta2(2);
+theta2(7) = pi+theta2(3);
+theta2(8) = pi+theta2(4);
 
 
 
@@ -105,7 +105,7 @@ theta2(8) = pi-theta2(2);
 for i = 1:8
     theta5(i) = atan2( -cos(theta1(i))*sin(theta2(i)-theta4(i))*POSE(1,3) - sin(theta1(i))*sin(theta2(i)-theta4(i))*POSE(2,3) + cos(theta2(i)-theta4(i))*POSE(3,3) ,                         cos(theta1(i))*cos(theta2(i)-theta4(i))*POSE(1,3) + sin(theta1(i))*cos(theta2(i)-theta4(i))*POSE(2,3) + sin(theta2(i)-theta4(i))*POSE(3,3) );
 
-    theta5b(i) = theta5(i)+pi;
+    theta5b(i)= theta5(i)+pi;
 
     theta6(i) = atan2( sqrt(1-(sin(theta1(i))*POSE(1,3) - cos(theta1(i))*POSE(2,3))^2),                         sin(theta1(i))*POSE(1,3) - cos(theta1(i))*POSE(2,3) );
 
@@ -113,7 +113,7 @@ for i = 1:8
 
     theta7(i) = atan2(             sin(theta1(i))*POSE(1,2) - cos(theta1(i))*POSE(2,2),                        -sin(theta1(i))*POSE(1,1) + cos(theta1(i))*POSE(2,1));
 
-    theta7b(i) = theta7(i)+pi;
+    theta7b(i)= theta7(i)+pi;
 end
 
 % INDICE - MCI COMPLETO
@@ -140,7 +140,7 @@ for i = 1:8
 end
 
 %Solução completa
-sol
+%sol
 
 %Solução apenas de MCI
-%sol(1:8,1:4)
+sol(1:8,1:4)
