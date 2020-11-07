@@ -1,8 +1,8 @@
-clear; clc;
+clear; clc; clc;
 
 %Dimensões do Robo
-a1=1; a2=1; a3=1; % Links do 3R cotovelar
-a7=1; % Comprimento do centro do pinho esferico ao efetuador
+lbs=1; lse=1; lew=1; % Links do 3R cotovelar
+lwf=1; % Comprimento do centro do pinho esferico ao efetuador
 
 
 % POSE desejada
@@ -33,9 +33,9 @@ POSE = POSE3;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Primeiro achar o centro do punho
-Xc = POSE(1,4) - a7*POSE(1,3);
-Yc = POSE(2,4) - a7*POSE(2,3);
-Zc = POSE(3,4) - a7*POSE(3,3);
+Xc = POSE(1,4) - lwf*POSE(1,3);
+Yc = POSE(2,4) - lwf*POSE(2,3);
+Zc = POSE(3,4) - lwf*POSE(3,3);
 %Exibir ponto C 
 %[Xc;Yc;Zc]
 
@@ -50,10 +50,10 @@ Zc = POSE(3,4) - a7*POSE(3,3);
 % 8 - Braço trás    Cotovelo Esquerda
 
 %Lei dos Cossenos
-r2        = Xc^2 + Yc^2 + (Zc-a1)^2;       % R^2
+r2        = Xc^2 + Yc^2 + (Zc-lbs)^2;       % R^2
 rl        = sqrt(Xc^2 + Yc^2);
-D         = (a3^2 + a2^2 - r2  ) / (2*a2*a3);
-E         = (r2   + a2^2 - a3^2) / (2*sqrt(r2)*a3);
+D         = (lew^2 + lse^2 -    r2) / (2*lse*lew);
+E         = (   r2 + lse^2 - lew^2) / (2*sqrt(r2)*lew);
 
 % Theta 1
 theta1(1) = atan2(Yc,Xc);
@@ -86,10 +86,10 @@ theta3(7) = theta3(3);
 theta3(8) = theta3(4);
 
 % Theta 2
-theta2(1) = pi/2 - atan2(Zc-a1,rl) + atan2(-sqrt(1-E^2),E);
-theta2(2) = pi/2 - atan2(Zc-a1,rl) + atan2( sqrt(1-E^2),E);
-theta2(3) = pi/2 - atan2(Zc-a1,rl);
-theta2(4) = pi/2 - atan2(Zc-a1,rl);
+theta2(1) = pi/2 - atan2(Zc-lbs,rl) + atan2(-sqrt(1-E^2),E);
+theta2(2) = pi/2 - atan2(Zc-lbs,rl) + atan2( sqrt(1-E^2),E);
+theta2(3) = pi/2 - atan2(Zc-lbs,rl);
+theta2(4) = pi/2 - atan2(Zc-lbs,rl);
 theta2(5) = -theta2(1);
 theta2(6) = -theta2(2);
 theta2(7) = -theta2(3);
@@ -124,19 +124,63 @@ end
 
 % Calculo dos Theta
 for i = 1:8
-    theta5(i) = atan2( -cos(theta1(i))*sin(theta2(i)-theta4(i))*POSE(1,3) - sin(theta1(i))*sin(theta2(i)-theta4(i))*POSE(2,3) + cos(theta2(i)-theta4(i))*POSE(3,3) ,                         cos(theta1(i))*cos(theta2(i)-theta4(i))*POSE(1,3) + sin(theta1(i))*cos(theta2(i)-theta4(i))*POSE(2,3) + sin(theta2(i)-theta4(i))*POSE(3,3) );
+    r13(i) = POSE(2,3)*(cos(theta4(i))*(cos(theta1(i))*sin(theta3(i)) + cos(theta2(i))*cos(theta3(i))*sin(theta1(i))) + sin(theta1(i))*sin(theta2(i))*sin(theta4(i))) - POSE(1,3)*(cos(theta4(i))*(sin(theta1(i))*sin(theta3(i)) - cos(theta1(i))*cos(theta2(i))*cos(theta3(i))) - cos(theta1(i))*sin(theta2(i))*sin(theta4(i))) + POSE(3,3)*(cos(theta2(i))*sin(theta4(i)) - cos(theta3(i))*cos(theta4(i))*sin(theta2(i)));
+    r23(i) = POSE(2,3)*(cos(theta1(i))*cos(theta3(i)) - cos(theta2(i))*sin(theta1(i))*sin(theta3(i))) - POSE(1,3)*(cos(theta3(i))*sin(theta1(i)) + cos(theta1(i))*cos(theta2(i))*sin(theta3(i))) + POSE(3,3)*sin(theta2(i))*sin(theta3(i));
+    r31(i) = POSE(1,1)*(sin(theta4(i))*(sin(theta1(i))*sin(theta3(i)) - cos(theta1(i))*cos(theta2(i))*cos(theta3(i))) + cos(theta1(i))*cos(theta4(i))*sin(theta2(i))) - POSE(2,1)*(sin(theta4(i))*(cos(theta1(i))*sin(theta3(i)) + cos(theta2(i))*cos(theta3(i))*sin(theta1(i))) - cos(theta4(i))*sin(theta1(i))*sin(theta2(i))) + POSE(3,1)*(cos(theta2(i))*cos(theta4(i)) + cos(theta3(i))*sin(theta2(i))*sin(theta4(i)));
+    r32(i) = POSE(1,2)*(sin(theta4(i))*(sin(theta1(i))*sin(theta3(i)) - cos(theta1(i))*cos(theta2(i))*cos(theta3(i))) + cos(theta1(i))*cos(theta4(i))*sin(theta2(i))) - POSE(2,2)*(sin(theta4(i))*(cos(theta1(i))*sin(theta3(i)) + cos(theta2(i))*cos(theta3(i))*sin(theta1(i))) - cos(theta4(i))*sin(theta1(i))*sin(theta2(i))) + POSE(3,2)*(cos(theta2(i))*cos(theta4(i)) + cos(theta3(i))*sin(theta2(i))*sin(theta4(i)));
+    r33(i) = POSE(1,3)*(sin(theta4(i))*(sin(theta1(i))*sin(theta3(i)) - cos(theta1(i))*cos(theta2(i))*cos(theta3(i))) + cos(theta1(i))*cos(theta4(i))*sin(theta2(i))) - POSE(2,3)*(sin(theta4(i))*(cos(theta1(i))*sin(theta3(i)) + cos(theta2(i))*cos(theta3(i))*sin(theta1(i))) - cos(theta4(i))*sin(theta1(i))*sin(theta2(i))) + POSE(3,3)*(cos(theta2(i))*cos(theta4(i)) + cos(theta3(i))*sin(theta2(i))*sin(theta4(i)));
 
+    %theta5
+    theta5(i) = atan2(r23(i),r13(i));
     theta5b(i)= theta5(i)+pi;
 
-    theta6(i) = atan2( sqrt(1-(sin(theta1(i))*POSE(1,3) - cos(theta1(i))*POSE(2,3))^2),                         sin(theta1(i))*POSE(1,3) - cos(theta1(i))*POSE(2,3) );
-
-    theta6b(i)= atan2(-sqrt(1-(sin(theta1(i))*POSE(1,3) - cos(theta1(i))*POSE(2,3))^2),                         sin(theta1(i))*POSE(1,3) - cos(theta1(i))*POSE(2,3) );
-
-    theta7(i) = atan2(             sin(theta1(i))*POSE(1,2) - cos(theta1(i))*POSE(2,2),                        -sin(theta1(i))*POSE(1,1) + cos(theta1(i))*POSE(2,1));
-
+    %theta6
+    theta6(i)  = atan2( sqrt(1-r33(i)^2),r33(i));
+    theta6b(i) = atan2(-sqrt(1-r33(i)^2),r33(i));
+    
+    %theta7
+    theta7(i) = atan2(r32(i),-r31(i));
     theta7b(i)= theta7(i)+pi;
 end
 
+for i = 1:8
+    if (theta5(i) > pi)
+        theta5(i) = theta5(i) -2*pi;
+    end
+    if (theta6(i) > pi)
+        theta6(i) = theta6(i) -2*pi;
+    end
+    if (theta7(i) > pi)
+        theta7(i) = theta7(i) -2*pi;
+    end
+    if (theta5b(i) > pi)
+        theta5b(i) = theta5b(i) -2*pi;
+    end
+    if (theta6b(i) > pi)
+        theta6b(i) = theta6b(i) -2*pi;
+    end
+    if (theta7b(i) > pi)
+        theta7b(i) = theta7b(i) -2*pi;
+    end
+    if (theta5(i) < -pi)
+        theta5(i) = theta5(i) +2*pi;
+    end
+    if (theta6(i) < -pi)
+        theta6(i) = theta6(i) +2*pi;
+    end
+    if (theta7(i) < -pi)
+        theta7(i) = theta7(i) +2*pi;
+    end
+    if (theta5b(i) < -pi)
+        theta5b(i) = theta5b(i) +2*pi;
+    end
+    if (theta6b(i) < -pi)
+        theta6b(i) = theta6b(i) +2*pi;
+    end
+    if (theta7b(i) < -pi)
+        theta7b(i) = theta7b(i) +2*pi;
+    end
+end
 % INDICE - MCI COMPLETO
 % 1  - Braço frente  Cotovelo Cima      Punho Normal
 % 2  - Braço frente  Cotovelo Baixo     Punho Normal
@@ -164,12 +208,12 @@ end
 %sol
 
 %Solução apenas de MCI
-sol(1:8,1:7).'
+%sol(1:8,1:7).'
 %Validação de MCI
-l1 = 1;
-l2 = 1;
-l3 = 1;
-l4 = 1;
+l1 = lbs;
+l2 = lse;
+l3 = lew;
+l4 = lwf;
 for i = 1:8
     s1 = sin(theta1(i));
     s2 = sin(theta2(i));
@@ -187,5 +231,54 @@ for i = 1:8
         [0, 0, 0, 1]
     ];
 end
-[ MCD_POS(1:3,4,1)  MCD_POS(1:3,4,2)  MCD_POS(1:3,4,3)  MCD_POS(1:3,4,4)   MCD_POS(1:3,4,5)  MCD_POS(1:3,4,6)  MCD_POS(1:3,4,7)  MCD_POS(1:3,4,8)] 
-[Xc;Yc;Zc]
+valid_pos = [ MCD_POS(1:3,4,1)  MCD_POS(1:3,4,2)  MCD_POS(1:3,4,3)  MCD_POS(1:3,4,4)   MCD_POS(1:3,4,5)  MCD_POS(1:3,4,6)  MCD_POS(1:3,4,7)  MCD_POS(1:3,4,8) [Xc;Yc;Zc] ];
+
+sol
+
+for i = 1:8
+    s1 = sin(theta1(i));
+    s2 = sin(theta2(i));
+    s3 = sin(theta3(i));
+    s4 = sin(theta4(i));
+    s5 = sin(theta5(i));
+    s6 = sin(theta6(i));
+    s7 = sin(theta7(i));
+    c1 = cos(theta1(i));
+    c2 = cos(theta2(i));
+    c3 = cos(theta3(i));
+    c4 = cos(theta4(i));
+    c5 = cos(theta5(i));
+    c6 = cos(theta6(i));
+    c7 = cos(theta7(i));
+
+    MCD_POS(:,:,i) = [ %MCD completa
+        [((((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*c5 + (-s1*c3 - s3*c1*c2)*s5)*c6 + ((-s1*s3 + c1*c2*c3)*s4 - s2*c1*c4)*s6)*c7 + (-((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*s5 + (-s1*c3 - s3*c1*c2)*c5)*s7, -((((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*c5 + (-s1*c3 - s3*c1*c2)*s5)*c6 + ((-s1*s3 + c1*c2*c3)*s4 - s2*c1*c4)*s6)*s7 + (-((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*s5 + (-s1*c3 - s3*c1*c2)*c5)*c7, (((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*c5 + (-s1*c3 - s3*c1*c2)*s5)*s6 - ((-s1*s3 + c1*c2*c3)*s4 - s2*c1*c4)*c6, ((((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*c5 + (-s1*c3 - s3*c1*c2)*s5)*s6 - ((-s1*s3 + c1*c2*c3)*s4 - s2*c1*c4)*c6)*l4 + (-(-s1*s3 + c1*c2*c3)*s4 + s2*c1*c4)*l3 + l2*s2*c1]
+        [((((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*c5 + (-s1*s3*c2 + c1*c3)*s5)*c6 + ((s1*c2*c3 + s3*c1)*s4 - s1*s2*c4)*s6)*c7 + (-((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*s5 + (-s1*s3*c2 + c1*c3)*c5)*s7, -((((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*c5 + (-s1*s3*c2 + c1*c3)*s5)*c6 + ((s1*c2*c3 + s3*c1)*s4 - s1*s2*c4)*s6)*s7 + (-((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*s5 + (-s1*s3*c2 + c1*c3)*c5)*c7, (((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*c5 + (-s1*s3*c2 + c1*c3)*s5)*s6 - ((s1*c2*c3 + s3*c1)*s4 - s1*s2*c4)*c6, ((((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*c5 + (-s1*s3*c2 + c1*c3)*s5)*s6 - ((s1*c2*c3 + s3*c1)*s4 - s1*s2*c4)*c6)*l4 + (-(s1*c2*c3 + s3*c1)*s4 + s1*s2*c4)*l3 + l2*s1*s2]
+        [(((-s2*c3*c4 + s4*c2)*c5 + s2*s3*s5)*c6 + (-s2*s4*c3 - c2*c4)*s6)*c7 + (-(-s2*c3*c4 + s4*c2)*s5 + s2*s3*c5)*s7, -(((-s2*c3*c4 + s4*c2)*c5 + s2*s3*s5)*c6 + (-s2*s4*c3 - c2*c4)*s6)*s7 + (-(-s2*c3*c4 + s4*c2)*s5 + s2*s3*c5)*c7, ((-s2*c3*c4 + s4*c2)*c5 + s2*s3*s5)*s6 - (-s2*s4*c3 - c2*c4)*c6, (((-s2*c3*c4 + s4*c2)*c5 + s2*s3*s5)*s6 - (-s2*s4*c3 - c2*c4)*c6)*l4 + (s2*s4*c3 + c2*c4)*l3 + l1 + l2*c2]
+        [0, 0, 0, 1]
+    ];
+
+    s1 = sin(theta1(i));
+    s2 = sin(theta2(i));
+    s3 = sin(theta3(i));
+    s4 = sin(theta4(i));
+    s5 = sin(theta5b(i));
+    s6 = sin(theta6b(i));
+    s7 = sin(theta7b(i));
+    c1 = cos(theta1(i));
+    c2 = cos(theta2(i));
+    c3 = cos(theta3(i));
+    c4 = cos(theta4(i));
+    c5 = cos(theta5b(i));
+    c6 = cos(theta6b(i));
+    c7 = cos(theta7b(i));
+
+    MCD_POS(:,:,i+8) = [ %MCD completa
+        [((((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*c5 + (-s1*c3 - s3*c1*c2)*s5)*c6 + ((-s1*s3 + c1*c2*c3)*s4 - s2*c1*c4)*s6)*c7 + (-((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*s5 + (-s1*c3 - s3*c1*c2)*c5)*s7, -((((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*c5 + (-s1*c3 - s3*c1*c2)*s5)*c6 + ((-s1*s3 + c1*c2*c3)*s4 - s2*c1*c4)*s6)*s7 + (-((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*s5 + (-s1*c3 - s3*c1*c2)*c5)*c7, (((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*c5 + (-s1*c3 - s3*c1*c2)*s5)*s6 - ((-s1*s3 + c1*c2*c3)*s4 - s2*c1*c4)*c6, ((((-s1*s3 + c1*c2*c3)*c4 + s2*s4*c1)*c5 + (-s1*c3 - s3*c1*c2)*s5)*s6 - ((-s1*s3 + c1*c2*c3)*s4 - s2*c1*c4)*c6)*l4 + (-(-s1*s3 + c1*c2*c3)*s4 + s2*c1*c4)*l3 + l2*s2*c1]
+        [((((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*c5 + (-s1*s3*c2 + c1*c3)*s5)*c6 + ((s1*c2*c3 + s3*c1)*s4 - s1*s2*c4)*s6)*c7 + (-((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*s5 + (-s1*s3*c2 + c1*c3)*c5)*s7, -((((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*c5 + (-s1*s3*c2 + c1*c3)*s5)*c6 + ((s1*c2*c3 + s3*c1)*s4 - s1*s2*c4)*s6)*s7 + (-((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*s5 + (-s1*s3*c2 + c1*c3)*c5)*c7, (((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*c5 + (-s1*s3*c2 + c1*c3)*s5)*s6 - ((s1*c2*c3 + s3*c1)*s4 - s1*s2*c4)*c6, ((((s1*c2*c3 + s3*c1)*c4 + s1*s2*s4)*c5 + (-s1*s3*c2 + c1*c3)*s5)*s6 - ((s1*c2*c3 + s3*c1)*s4 - s1*s2*c4)*c6)*l4 + (-(s1*c2*c3 + s3*c1)*s4 + s1*s2*c4)*l3 + l2*s1*s2]
+        [(((-s2*c3*c4 + s4*c2)*c5 + s2*s3*s5)*c6 + (-s2*s4*c3 - c2*c4)*s6)*c7 + (-(-s2*c3*c4 + s4*c2)*s5 + s2*s3*c5)*s7, -(((-s2*c3*c4 + s4*c2)*c5 + s2*s3*s5)*c6 + (-s2*s4*c3 - c2*c4)*s6)*s7 + (-(-s2*c3*c4 + s4*c2)*s5 + s2*s3*c5)*c7, ((-s2*c3*c4 + s4*c2)*c5 + s2*s3*s5)*s6 - (-s2*s4*c3 - c2*c4)*c6, (((-s2*c3*c4 + s4*c2)*c5 + s2*s3*s5)*s6 - (-s2*s4*c3 - c2*c4)*c6)*l4 + (s2*s4*c3 + c2*c4)*l3 + l1 + l2*c2]
+        [0, 0, 0, 1]
+    ];
+end
+
+MCD_POS
