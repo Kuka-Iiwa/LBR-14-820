@@ -1,8 +1,8 @@
 clear; clc; clc;
 
 %Dimensões do Robo
-lbs=1; lse=1; lew=1; % Links do 3R cotovelar
-lwf=1; % Comprimento do centro do pinho esferico ao efetuador
+lbs=0.36; lse=0.42; lew=0.4; % Links do 3R cotovelar
+lwf=0.09; % Comprimento do centro do pinho esferico ao efetuador
 
 
 % POSE desejada
@@ -23,9 +23,9 @@ POSE2 = [
 
 POSE3 = [                       %theta1 = -90;
     0    1  0   0;              %theta2 =  60;
-   -1    0  0   -1.732051;      %theta3 =   0;
-    0    0  1   2;              %theta4 =  60;
-    0    0  1   1;              %theta5 =   0;
+   -1    0  0   -0.710141;      %theta3 =   0;
+    0    0  1   0.46;           %theta4 = -60;
+    0    0  0   1;              %theta5 =   0;
 ];                              %theta6 =-120;
                                 %theta7 =   0;
 
@@ -37,7 +37,7 @@ Xc = POSE(1,4) - lwf*POSE(1,3);
 Yc = POSE(2,4) - lwf*POSE(2,3);
 Zc = POSE(3,4) - lwf*POSE(3,3);
 %Exibir ponto C 
-%[Xc;Yc;Zc]
+[Xc;Yc;Zc]
 
 % INDICE - MCI de posição
 % 1 - Braço frente  Cotovelo Cima
@@ -53,12 +53,12 @@ Zc = POSE(3,4) - lwf*POSE(3,3);
 r2        = Xc^2 + Yc^2 + (Zc-lbs)^2;       % R^2
 rl        = sqrt(Xc^2 + Yc^2);
 D         = (lew^2 + lse^2 -    r2) / (2*lse*lew);
-E         = (   r2 + lse^2 - lew^2) / (2*sqrt(r2)*lew);
+E         = (   r2 + lse^2 - lew^2) / (2*sqrt(r2)*lse);%lew
 
 % Theta 1
 theta1(1) = atan2(Yc,Xc);
 theta1(2) = theta1(1);
-theta1(3) = theta1(1) + atan2(-sqrt(1-E^2),E);
+theta1(3) = theta1(1) - atan2( sqrt(1-E^2),E);
 theta1(4) = theta1(1) + atan2( sqrt(1-E^2),E);
 theta1(5) = theta1(1) + pi;
 theta1(6) = theta1(2) + pi;
@@ -66,8 +66,8 @@ theta1(7) = theta1(3) + pi;
 theta1(8) = theta1(4) + pi;
 
 % Theta 4
-theta4(1) = pi - atan2(-sqrt(1-D^2),D);
-theta4(2) = pi - atan2( sqrt(1-D^2),D);
+theta4(1) = -pi + atan2( sqrt(1-D^2),D);
+theta4(2) = +pi - atan2( sqrt(1-D^2),D);
 theta4(3) = theta4(1);
 theta4(4) = theta4(2);
 theta4(5) = -theta4(1);
@@ -86,7 +86,7 @@ theta3(7) = theta3(3);
 theta3(8) = theta3(4);
 
 % Theta 2
-theta2(1) = pi/2 - atan2(Zc-lbs,rl) + atan2(-sqrt(1-E^2),E);
+theta2(1) = pi/2 - atan2(Zc-lbs,rl) - atan2( sqrt(1-E^2),E);
 theta2(2) = pi/2 - atan2(Zc-lbs,rl) + atan2( sqrt(1-E^2),E);
 theta2(3) = pi/2 - atan2(Zc-lbs,rl);
 theta2(4) = pi/2 - atan2(Zc-lbs,rl);
@@ -96,26 +96,26 @@ theta2(7) = -theta2(3);
 theta2(8) = -theta2(4);
 
 %Corrigir espaço de trabalho do robô
-for i = 1:8
-    if (theta1(i) > pi)
-        theta1(i) = theta1(i) -2*pi;
-    end
-    if (theta2(i) > pi)
-        theta2(i) = theta2(i) -2*pi;
-    end
-    if (theta4(i) > pi)
-        theta4(i) = theta4(i) -2*pi;
-    end
-    if (theta1(i) < -pi)
-        theta1(i) = theta1(i) +2*pi;
-    end
-    if (theta2(i) < -pi)
-        theta2(i) = theta2(i) +2*pi;
-    end
-    if (theta4(i) < -pi)
-        theta4(i) = theta4(i) +2*pi;
-    end
-end
+% for i = 1:8
+%     if (theta1(i) > pi)
+%         theta1(i) = theta1(i) -2*pi;
+%     end
+%     if (theta2(i) > pi)
+%         theta2(i) = theta2(i) -2*pi;
+%     end
+%     if (theta4(i) > pi)
+%         theta4(i) = theta4(i) -2*pi;
+%     end
+%     if (theta1(i) < -pi)
+%         theta1(i) = theta1(i) +2*pi;
+%     end
+%     if (theta2(i) < -pi)
+%         theta2(i) = theta2(i) +2*pi;
+%     end
+%     if (theta4(i) < -pi)
+%         theta4(i) = theta4(i) +2*pi;
+%     end
+% end
 
 
 % INDICE - MCI de Orientação - Punho esferico
@@ -132,7 +132,7 @@ for i = 1:8
 
     %theta5
     theta5(i) = atan2(r23(i),r13(i));
-    theta5b(i)= theta5(i)+pi;
+    theta5b(i)= atan2(-r23(i),-r13(i));
 
     %theta6
     theta6(i)  = atan2( sqrt(1-r33(i)^2),r33(i));
@@ -140,47 +140,47 @@ for i = 1:8
     
     %theta7
     theta7(i) = atan2(r32(i),-r31(i));
-    theta7b(i)= theta7(i)+pi;
+    theta7b(i)= atan2(-r23(i),r13(i));
 end
-
-for i = 1:8
-    if (theta5(i) > pi)
-        theta5(i) = theta5(i) -2*pi;
-    end
-    if (theta6(i) > pi)
-        theta6(i) = theta6(i) -2*pi;
-    end
-    if (theta7(i) > pi)
-        theta7(i) = theta7(i) -2*pi;
-    end
-    if (theta5b(i) > pi)
-        theta5b(i) = theta5b(i) -2*pi;
-    end
-    if (theta6b(i) > pi)
-        theta6b(i) = theta6b(i) -2*pi;
-    end
-    if (theta7b(i) > pi)
-        theta7b(i) = theta7b(i) -2*pi;
-    end
-    if (theta5(i) < -pi)
-        theta5(i) = theta5(i) +2*pi;
-    end
-    if (theta6(i) < -pi)
-        theta6(i) = theta6(i) +2*pi;
-    end
-    if (theta7(i) < -pi)
-        theta7(i) = theta7(i) +2*pi;
-    end
-    if (theta5b(i) < -pi)
-        theta5b(i) = theta5b(i) +2*pi;
-    end
-    if (theta6b(i) < -pi)
-        theta6b(i) = theta6b(i) +2*pi;
-    end
-    if (theta7b(i) < -pi)
-        theta7b(i) = theta7b(i) +2*pi;
-    end
-end
+% 
+% for i = 1:8
+%     if (theta5(i) > pi)
+%         theta5(i) = theta5(i) -2*pi;
+%     end
+%     if (theta6(i) > pi)
+%         theta6(i) = theta6(i) -2*pi;
+%     end
+%     if (theta7(i) > pi)
+%         theta7(i) = theta7(i) -2*pi;
+%     end
+%     if (theta5b(i) > pi)
+%         theta5b(i) = theta5b(i) -2*pi;
+%     end
+%     if (theta6b(i) > pi)
+%         theta6b(i) = theta6b(i) -2*pi;
+%     end
+%     if (theta7b(i) > pi)
+%         theta7b(i) = theta7b(i) -2*pi;
+%     end
+%     if (theta5(i) < -pi)
+%         theta5(i) = theta5(i) +2*pi;
+%     end
+%     if (theta6(i) < -pi)
+%         theta6(i) = theta6(i) +2*pi;
+%     end
+%     if (theta7(i) < -pi)
+%         theta7(i) = theta7(i) +2*pi;
+%     end
+%     if (theta5b(i) < -pi)
+%         theta5b(i) = theta5b(i) +2*pi;
+%     end
+%     if (theta6b(i) < -pi)
+%         theta6b(i) = theta6b(i) +2*pi;
+%     end
+%     if (theta7b(i) < -pi)
+%         theta7b(i) = theta7b(i) +2*pi;
+%     end
+% end
 % INDICE - MCI COMPLETO
 % 1  - Braço frente  Cotovelo Cima      Punho Normal
 % 2  - Braço frente  Cotovelo Baixo     Punho Normal
@@ -200,8 +200,8 @@ end
 % 16 - Braço trás    Cotovelo Esquerda  Punho Invertido
 
 for i = 1:8
-    sol (i  ,:) = [theta1(i) theta2(i) theta3(i) theta4(i)  theta5(i)  theta6(i)  theta7(i)]*180/pi;
-    sol (i+8,:) = [theta1(i) theta2(i) theta3(i) theta4(i) theta5b(i) theta6b(i) theta7b(i)]*180/pi;
+    sol (i  ,:) = [i/180*pi theta1(i) theta2(i) theta3(i) theta4(i)  theta5(i)  theta6(i)  theta7(i)]*180/pi;
+    sol (i+8,:) = [(i+8)/180*pi theta1(i) theta2(i) theta3(i) theta4(i) theta5b(i) theta6b(i) theta7b(i)]*180/pi;
 end
 
 %Solução completa
