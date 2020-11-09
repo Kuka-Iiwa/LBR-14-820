@@ -7,11 +7,11 @@ lwf=0.09; % Comprimento do centro do pinho esferico ao efetuador
 
 % POSE desejada
 POSE1 = [ 
- 1  0  0    2;
+ 0  0  1    0.09;
  0  1  0    0;
- 0  0  1    2;
+-1  0  0    1.18;
  0  0  0    1;
-]; % Posição home, entretanto com theta2 = 90° e theta6 = -90°
+]; % Posição home, entretanto com theta6 = -90°
 
 POSE2 = [ 
  1  0  0    2;
